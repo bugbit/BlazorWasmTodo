@@ -1,0 +1,57 @@
+﻿@page "/"
+@using Microsoft.EntityFrameworkCore;
+
+<PageTitle>Index</PageTitle>
+
+<p>Saved in memory, only available in memory for the current browser tab.</p>
+
+<ul>
+    @foreach (var todo in todos)
+    {
+        <li>
+            <input type="checkbox" @bind="todo.IsDone" @bind:after="() => this.TodoChangedAsync(todo)" />
+            <input @bind="todo.Title" @bind:after="() => this.TodoChangedAsync(todo)" />
+        </li>
+    }
+</ul>
+
+<input placeholder="Something todo" @bind="newTodo" />
+<button @onclick="AddTodoAsync">Add todo</button>
+
+@code
+{
+    private string? newTodo;
+    private List<TodoItem> todos = new();
+
+    [Inject] public TodoDbContext context { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await context.Database.EnsureCreatedAsync();
+
+        todos = await context.TodoItem.ToListAsync();
+
+        await base.OnInitializedAsync();
+    }
+
+    private async Task AddTodoAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(newTodo))
+        {
+            context.TodoItem.Add(new TodoItem { Title = newTodo });
+
+            newTodo = string.Empty;
+
+            await context.SaveChangesAsync();
+
+            todos = context.TodoItem.ToList();
+        }
+    }
+
+    private async Task TodoChangedAsync(TodoItem todo)
+    {
+        context.TodoItem.Entry(todo).State = EntityState.Modified;
+
+        await context.SaveChangesAsync();
+    }
+}
