@@ -77,4 +77,21 @@ public class SyncServices
 
         Console.WriteLine("Finish save database");
     }
+
+    public async Task EnsureDeletedAsync(DbContext dbContext, CancellationToken cancellationToken = default)
+    {
+        await dbContext.Database.CloseConnectionAsync();
+
+        await dbContext.Database.EnsureDeletedAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await dbContext.Database.EnsureCreatedAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await PersistenceAsync(dbContext, cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
+    }
 }

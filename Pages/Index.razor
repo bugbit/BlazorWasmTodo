@@ -1,5 +1,8 @@
 ﻿@page "/"
 @using Microsoft.EntityFrameworkCore;
+@using BlazorWasmTodo.Services
+@inject TodoDbContext context
+@inject SyncServices syncSrv
 
 <PageTitle>Index</PageTitle>
 
@@ -18,13 +21,12 @@
 
 <input placeholder="Something todo" @bind="newTodo" />
 <button @onclick="AddTodoAsync">Add todo</button>
+<button @onclick="ResetBDAsync">Reset BD</button>
 
 @code
 {
     private string? newTodo;
     private List<TodoItem> todos = new();
-
-    [Inject] public TodoDbContext context { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,7 +48,7 @@
 
             await context.SaveChangesAsync();
 
-            todos = context.TodoItem.ToList();
+            todos = await context.TodoItem.ToListAsync();
         }
     }
 
@@ -55,5 +57,12 @@
         context.TodoItem.Entry(todo).State = EntityState.Modified;
 
         await context.SaveChangesAsync();
+    }
+
+    private async Task ResetBDAsync()
+    {
+        await syncSrv.EnsureDeletedAsync(context);
+
+        todos = await context.TodoItem.ToListAsync();
     }
 }
