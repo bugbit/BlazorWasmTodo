@@ -1,7 +1,7 @@
 using BlazorWasmTodo;
-using BlazorWasmTodo.Components.JS;
-using BlazorWasmTodo.Components.Native;
 using BlazorWasmTodo.Model;
+using BlazorWasmTodo.Services;
+using KristofferStrube.Blazor.FileSystemAccess;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -13,29 +13,22 @@ builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
-string fileName = "/database/app.db";
-
-builder.Services.AddDbContext<TodoDbContext>(
-    options => options.UseSqlite($"Filename={fileName}"));
+builder.Services.AddFileSystemAccessService();
 
 // sqllite and Persisting data with the WebAssembly File System API
+builder.Services.AddScoped<SyncServices>();
 
-Console.WriteLine("Before mountAndInitializeDbNative");
-//CFile.mountAndInitializeDb();
-Console.WriteLine("After mountAndInitializeDbNative");
-await JSHost.ImportAsync("CallJSFile", "../js/file.js");
-await JSFile.MountAndInitializeDb();
-Console.WriteLine("After mountAndInitializeDbNative");
-if (!File.Exists(fileName))
-{
-    File.Create(fileName).Close();
-}
-Console.WriteLine("After Create file");
+builder.Services.AddDbContext<TodoDbContext>(
+    options => options.UseSqlite("Data Source=todo.sqlite3"));
 
 var host = builder.Build();
 
 var dbService = host.Services.GetRequiredService<TodoDbContext>();
+
+// sqllite and Persisting data with the WebAssembly File System API
+var syncService = host.Services.GetRequiredService<SyncServices>();
+
+await syncService.InitFromOriginPrivateAsync(dbService);
 
 await dbService.Database.EnsureCreatedAsync();
 

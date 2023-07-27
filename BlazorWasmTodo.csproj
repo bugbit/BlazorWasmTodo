@@ -4,20 +4,13 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
-		<!-- sqllite and Persisting data with the WebAssembly File System API -->
-		<!--<PublishTrimmed>true</PublishTrimmed>-->
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<EmccExtraLDFlags>-lidbfs.js</EmccExtraLDFlags>
-		<!--<EmccFlags>-s ASYNCIFY</EmccFlags>-->
-		<!--<EmccExtraCFlags>-s ASYNCIFY</EmccExtraCFlags>-->
 	</PropertyGroup>
 
-	<!-- sqllite and Persisting data with the WebAssembly File System API -->
-	<ItemGroup>
-		<NativeFileReference Include="Native/File.c" />
-	</ItemGroup>
 
 	<ItemGroup>
+		<!-- sqllite and Persisting data with the WebAssembly File System API -->
+		<!--Dejar version 1.2.1-->
+		<PackageReference Include="KristofferStrube.Blazor.FileSystemAccess" Version="1.2.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="7.0.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.9" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.9" />
