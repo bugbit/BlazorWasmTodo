@@ -7,7 +7,7 @@ namespace BlazorWasmTodo.Components.JS;
 public partial class JSFile
 {
     [JSImport("mountAndInitializeDb", "CallJSFile")]
-    internal static partial void MountAndInitializeDb();
+    internal static partial Task MountAndInitializeDb();
     [JSImport("syncDatabase", "CallJSFile")]
-    internal static partial void SyncDatabase(bool populate);
+    internal static partial Task SyncDatabase(bool populate);
 }
