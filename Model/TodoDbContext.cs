@@ -28,10 +28,18 @@ public class TodoDbContext : DbContext
     {
         var result = await base.SaveChangesAsync(cancellationToken);
 
+        cancellationToken.ThrowIfCancellationRequested();
+
+        await Database.CloseConnectionAsync();
+
         Console.WriteLine("Start saving database");
         await JSFile.SyncDatabase(false);
         //CFile.syncDatabase(0);
         Console.WriteLine("Finish save database");
+
+        await Database.OpenConnectionAsync(cancellationToken);
+
+        cancellationToken.ThrowIfCancellationRequested();
 
         return result;
     }
