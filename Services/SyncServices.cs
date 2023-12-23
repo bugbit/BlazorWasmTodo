@@ -65,7 +65,7 @@ public class SyncServices
         Console.WriteLine($"{dataSource} read {buffer.Length} bytes");
 
         var options = new FileSystemCreateWritableOptions { KeepExistingData = false };
-        var writer = await _fileHandle.CreateWritableAsync(options);
+        var writer = await _fileHandle!.CreateWritableAsync(options);
 
         await writer.WriteAsync(buffer, cancellationToken);
 
@@ -80,6 +80,7 @@ public class SyncServices
 
     public async Task EnsureDeletedAsync(DbContext dbContext, CancellationToken cancellationToken = default)
     {
+        dbContext.ChangeTracker.Clear();
         await dbContext.Database.CloseConnectionAsync();
 
         await dbContext.Database.EnsureDeletedAsync(cancellationToken);

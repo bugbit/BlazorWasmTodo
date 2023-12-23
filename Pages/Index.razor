@@ -12,9 +12,10 @@
 <ul>
     @foreach (var todo in todos)
     {
+        Func<Task> action = async () => await this.TodoChangedAsync(todo);
         <li>
-            <input type="checkbox" @bind="todo.IsDone" @bind:after="() => this.TodoChangedAsync(todo)" />
-            <input @bind="todo.Title" @bind:after="() => this.TodoChangedAsync(todo)" />
+            <input type="checkbox" @bind="todo.IsDone" @bind:after="action" />
+            <input @bind="todo.Title" @bind:after="action" />
         </li>
     }
 </ul>
